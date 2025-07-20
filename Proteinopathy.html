@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/beige.css">
+	<style>
+		.fragment {
+			opacity: 0;
+			transform: translateY(20px);
+			transition: all 0.5s ease-in-out;
+			font-size: 2rem; /* Initial font size */
+		}
+
+		.fragment.visible {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		.fragment.shrunk {
+			font-size: 1.5rem; /* Reduced font size for previous bullets */
+		}
+
+  /* Fix: iframe rule must be separate */
+		iframe {
+			background-color: indigo;
+		}
+
+  /* New class for fade-in then fade-out behavior */
+		.fade-in-then-out {
+			opacity: 0;
+			transition: all 0.6s ease;
+		}
+
+		.visible .fade-in-then-out.visible {
+			opacity: 1;
+		}
+
+		.fragment.fade-in-then-out.visible {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+
+		.visible .fade-in-then-out.visible:not(.current-fragment) {
+			opacity: 0;
+			transform: scale(0.95);
+		}
+			
+  /* 1) overlay that will fade-in over the images */
+		.fade-out-all {
+			position: absolute;
+			top: 0; left: 0;
+			width: 100%; height: 100%;
+			background: radial-gradient(
+				circle at center,
+				 rgba(255,255,255,1),
+				 rgba(249,245,222,1) 
+				);
+			opacity: 0;
+			transition: opacity 0.6s ease;
+			z-index: 10;
+		}
+		
+  /* when its fragment becomes 'visible', it fades in */
+		.fragment.fade-out-all.visible {
+			opacity: 1;
+		}		
+		
+
+  /* your new content layer */
+		.new-content {
+			position: absolute;
+			top: 0; left: 0;
+			width: 100%; height: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+			transition: opacity 0.6s ease;
+			z-index: 11;
+		}
+		
+  /* when triggered, fade it in */
+		.fragment.new-content.visible {
+			opacity: 1;
+		}		
+
+  /* New class for fade-in image behavior */			
+		.overlay-container {
+			position: relative;
+			width: 60vw;
+			aspect-ratio: 4355 / 2205;
+			margin: 0 auto;
+			overflow: hidden;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.overlay-container img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: auto;
+			object-fit: contain;
+			margin: 0;
+			padding: 0;
+			border: none;
+		}
+
+		.fade-step {
+			opacity: 0;
+			transition: opacity 0.6s ease;
+		}
+
+		.fragment.fade-step.visible {
+			opacity: 1;
+		}
+		
+  /* New class for custom footer */		
+		.my-footer {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			background-color: rgba(0, 0, 0, 0.5);
+			color: white;
+			padding: 10px;
+			text-align: center;
+			font-size: 0.7em;
+		}
+		
+  /* New class for shrinking Overview Mode */				
+		.reveal.overview .slides section {
+			transform: scale(0.8);       /* Adjust to fit your screen */
+			transform-origin: top left;  /* Keeps slides aligned */
+		}
+
+	</style>
+  
+	<style>
+		.bold-text {
+			font-weight: 800;
+		}
+	</style>
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+
+</head>
+
+
+	<body>
+		<div id="myLogo" style="background: url(pngegg.png);
+                        position: absolute;
+                        bottom: 900px;
+                        right: 10px;
+                        width: 100px;
+                        height: 100px;
+                        background-size: contain;
+                        background-repeat: no-repeat;"></div>
+		<div class="reveal">
+			<div class="slides">
+				<section class="title-slide">
+					<h3 style="color: indigo">Parkinsonism Briefing/Discussion</h3>
+					<p style="color: indigo" class="r-fit-text"> A Focus on Underlying Mechanisms and Biomarkers for Early Diagnosis</p>
+				</section>
+				<section>
+						<h3 style="color: indigo">Index</h3>
+						<ul style="color: indigo">
+							<li>Background</li>
+							<li>Chronic Inflammation Drivers</li>
+							<li>Discussion</li>						
+						</ul>
+					</section>
+					
+				<section>
+				<style>
+					.bold-text {
+					font-weight: bold;
+					}
+					.indigo-text {
+					color: indigo;
+					}
+				</style>
+
+					<section data-footer="Background - Slide 1 of 4">
+						<h3 style="color: indigo" class="indigo-text">Background</h3>
+						<ul class="indigo-text" style="font-size: 90%; line-height: 1.5em;">
+    
+							<li class="fragment fade-in-then-out" data-fragment-index="0">
+								<div style="line-height: 1.2;">
+									Parkinsonism refers to a group of neurodegenerative diseases that share overlapping motor symptoms and some pathological features. These include <span class="bold-text">Parkinson’s Disease (PD)</span>, <span class="bold-text">Multiple System Atrophy (MSA)</span>, and <span class="bold-text">Lewy Body Dementia (LBD)</span>.
+								</div>
+							</li>
+
+							<li class="fragment fade-in-then-out" data-fragment-index="1">
+								<div style="line-height: 1.2;">
+									<span class="bold-text">LBD</span> affects ~1.4 million people in the U.S. <br>
+									<span class="bold-text">PD</span> affects ~1 million people. <br>
+									<span class="bold-text">MSA</span> is rare—fewer than 50,000 cases (designated an <span class="bold-text">Orphan Disease</span>).
+								</div>
+							</li>					
+
+							<li class="fragment fade-in-then-out" data-fragment-index="2">
+								<div style="line-height: 1.2;">
+									Generally they have a long <span class="bold-text">prodromal</span> period, but after <span class="bold-text">Central Nervous System</span> involvement, the progression rates are significantly different.
+								</div>
+							</li>
+
+							<li class="fragment fade-in-then-out" data-fragment-index="3">
+								<div style="line-height: 1.2;">
+								    Today's main therapy—<span class="bold-text">Levodopa</span>—was FDA approved <span class="bold-text">in 1975 - YIKES!</span>.
+									It’s still the standard for PD, often used in MSA, and sometimes used in LBD.
+								</div>
+							</li>
+						</ul>
+					</section>
+
+
+					<section data-footer="Background - Slide 2 of 4">
+						<h3 style="color: indigo; margin-bottom: 1em;" class="indigo-text">Parkinsonism/Synucleinopathy Spectrum</h3>
+						<ul style="color: indigo">
+						<table>
+							<tr>
+								<th style="font-size: 24px;"><span class="bold-text">Feature/Aspect</span></th>
+								<th style="font-size: 24px;"><span class="bold-text">Parkinson's Disease</span></th>
+								<th style="font-size: 24px;"><span class="bold-text">Multiple System Atrophy</span></th>
+								<th style="font-size: 24px;"><span class="bold-text">Lewy Body Dementia</span></>
+							</tr>
+						
+							<tr>
+								<td style="font-size: 24px;"><span class="bold-text">Select Clinical Presentation</span></td>
+								<td style="font-size: 20px;">Motor dysfunction, gradual progression post diagnosis</td>
+								<td style="font-size: 20px;">Autonomic dysfunction, motor dysfunction, rapid progression post diagnosis</td>
+								<td style="font-size: 20px;">Cognitive symptoms, hallucinations</td>
+							</tr>
+						
+							<tr>
+								<td style="font-size: 24px;"><span class="bold-text">Pathology Highlights</span></td>
+								<td colspan="3" style="font-size: 20px;">Protein toxicity (starts with misfolded alpha-synuclein and progresses to insoluble aggregates), chronic neuro-inflammation, occurs in cells with high mitochondria density</td>
+							</tr>
+						
+							<tr>
+								<td style="font-size: 24px;"><span class="bold-text">Contemporary Models</span></td>
+								<td colspan="3" style="font-size: 20px;">Triggers such as environmental toxins, genetic mutations, or pathogens fall into one of two models referred to as 'Body-First' OR 'Brain-First'</td>
+							</tr>
+						</table>
+						</u>
+					</section>
+				
+					<section data-footer="Background - Slide 3 of 4">
+						<h3 style="color: indigo; font-size: 34px;" class="indigo-text">General Model of Parkinsonism Progression: Prodromal and Post-Prodromal Phases</h3>
+							<iframe 
+								src="new 1.html" 
+								width="100%" 
+								height=500
+								style="border:none; background: transparent;" 
+								allowtransparency="true">
+							</iframe>
+							<p style="font-size: 12px; color: indigo; text-align: right; margin-top: 4px;">
+								Adapted from: Kalia LV, Lang AE. <i>Parkinson’s disease</i>. Lancet. 2015;386(9996):896–912. 
+								<a href="https://doi.org/10.1016/S0140-6736(14)61393-3" target="_blank" style="color: indigo;">https://doi.org/10.1016/S0140-6736(14)61393-3</a>
+							</p>
+					</section>	
+				
+					<section data-footer="Background - Slide 4 of 4">
+						<div style="display: flex; flex-direction: column; align-items: center;">
+							<h3 style="color: indigo"; class="indigo-text">Parkinsonism Pathology</h3>
+							<div class="overlay-container">				
+								<img data-src="base.png" alt="Base Image">
+								<img data-src="box1.png" class="fragment fade-step" data-fragment-index="0" alt="Box 1">
+								<img data-src="box2.png" class="fragment fade-step" data-fragment-index="1" alt="Box 2">
+								<img data-src="box3.png" class="fragment fade-step" data-fragment-index="2" alt="Box 3">
+								<img data-src="box4.png" class="fragment fade-step" data-fragment-index="3" alt="Box 4">
+							</div>
+						</div>
+					</section>
+					
+					<section class="hide-in-presentation overview-align-background" data-footer="Background - Bonus">
+						<div style="position: relative; padding-bottom: 75%; height: 0; overflow: hidden;">
+							<iframe src="https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=1nc1AmCGVeYvWKCsUK-RoPmd7edOBzMuWDLVsUuCPpzY&font=Default&lang=en&initial_zoom=2&height=650"
+								style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+								frameborder="0"
+								allowfullscreen>
+							</iframe>
+						</div>
+					</section>	
+					
+				</section>
+								
+				<section>
+					<section data-footer="Chronic Inflammation Drivers - Slide 1 of 7">
+						<h3 style="color: indigo; margin-bottom: 70px;">Chronic Inflammation Drivers</h3>
+						<div style="display: flex; justify-content: flex-start; gap: 40px; transform: translateX(-5%); margin-top: 20px;">
+    
+								<!-- Image Container -->
+							<div style="flex: 1; max-width: 40%">
+								<img src="chronic_inflammation.png" alt="Chronic Inflammation" style="width: 100%; height: auto;">
+							</div>
+
+								<!-- Bullet List Container -->
+							<div style="width: 65%; font-size: 1.5rem; color: indigo">
+								<ul style="line-height: 1.4;">
+									<li class="fragment fade-in">Mitochondrial Dysfunction</li>
+									<li class="fragment fade-in">Proteostasis Dysfunction</li>
+									<li class="fragment fade-in">Endogenous Retrovirus (ERV) Derepression</li>
+									<li class="fragment fade-in">Endoplasmic Reticulum Stress/Unfolded Protein Response (UPR)</li>
+									<li class="fragment fade-in">P-Body Dysfunction</li>
+									<li class="fragment fade-in">Misfolded <span>&#593;</span>-synuclein Accumulation</li>
+								</ul>
+							</div>
+
+						</div>
+					
+					</section>
+					
+					<section  class="hide-in-presentation overview-align-background" ; data-footer="Chronic Inflammation Drivers - Slide 2 of 7">
+						<h3 style ="color: indigo">Mitochondrial Dysfunction</h3>
+					</section>
+					
+					<section  class="hide-in-presentation overview-align-background"  data-footer="Chronic Inflammation Drivers - Slide 3 of 7">
+						<h3 style ="color: indigo">Proteostasis Dysfunction</h3>
+					</section>
+					
+					<section  data-footer="Chronic Inflammation Drivers - Slide 4 of 7">
+						<div style="display: flex; flex-direction: column; align-items: center; position: relative;">
+							<h3 style ="color: indigo; font-size: 42px;">Proposed Effect of Endogenous Retrovirus (ERV) Derepression</h3>						
+								<div class="overlay-container" style="position: relative">				
+									<img data-src="base2.png" alt="Base Image">
+									<img data-src="box2_1.png" class="fragment fade-step" data-fragment-index="0" alt="Box 1">
+									
+									<div class="fragment fade-out-all" data-fragment-index="1"></div>
+								</div>
+								
+								<div class="fragment new-content" data-fragment-index="2" style="margin-top: 1em; text-align: center;">
+									<p style="color: indigo; font-size: 2rem;">
+										Here’s the next step in the ERV derepression model…
+									</p>
+								</div>
+						</div>
+					</section>					
+					
+					<section  class="hide-in-presentation overview-align-background" ; data-footer="Chronic Inflammation Drivers - Slide 5 of 7">
+						<h3 style ="color: indigo">Endoplasmic Reticulum Stress/Unfolded Protein Response (UPR)</h3>
+					</section>			
+
+					<section  class="hide-in-presentation overview-align-background"  data-footer="Chronic Inflammation Drivers - Slide 6 of 7">
+						<h3 style ="color: indigo">P-Body Dysfunction</h3>
+					</section>				
+
+					<section  class="hide-in-presentation overview-align-background"  data-footer="Chronic Inflammation Drivers - Slide 7 of 7">
+						<h3 style ="color: indigo">Misfolded <span>&#593;</span>-synuclein Accumulation</h3>
+					</section>	
+					
+				</section>
+
+				<section>
+					<section><h3 style="color: indigo">Discussion</h3></section>
+					<section><h2>Subslide 1</h2></section>
+					<section><h2>Subslide 2</h2></section>
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		
+		<script>
+				// Reveal initialization
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				center: true,
+				hash: true,
+				plugins: [ RevealNotes, RevealMarkdown, RevealHighlight ]
+			});
+			
+			
+			(function(){
+				// selector for the slides you want only in overview
+				const BONUS = '.hide-in-presentation';
+
+				// array to hold references so we can re‑insert them later
+				const backups = [];
+
+				// once Reveal is ready, pull them out of the DOM
+				Reveal.addEventListener('ready', function(){
+					document.querySelectorAll(BONUS).forEach(slide => {
+					backups.push({
+					parent:     slide.parentNode,
+					nextSibling: slide.nextSibling,
+					slide:      slide
+				});
+				slide.parentNode.removeChild(slide);
+				});
+			
+				Reveal.sync();
+				});
+
+				// when entering overview: put them back
+				Reveal.addEventListener('overviewshown', function(){
+					backups.forEach(({parent,nextSibling,slide})=>{
+					if(!parent.contains(slide)){
+					parent.insertBefore(slide, nextSibling);
+					}
+				});
+				Reveal.sync();
+				});
+
+				// when leaving overview: remove them again
+				Reveal.addEventListener('overviewhidden', function(){
+					backups.forEach(({parent,slide})=>{
+					if(parent.contains(slide)){
+					parent.removeChild(slide);
+					}
+				});
+				Reveal.sync();
+				});
+			})();
+
+
+			Reveal.on('slidechanged', event => {
+				const currentSlide = event.currentSlide;
+				const footerText = currentSlide.getAttribute('data-footer') || '';
+				document.getElementById('custom-footer').innerText = footerText;
+			});
+			
+				// Initialize on first load
+			document.addEventListener('DOMContentLoaded', () => {
+				const currentSlide = Reveal.getCurrentSlide();
+				const footerText = currentSlide.getAttribute('data-footer') || '';
+				document.getElementById('custom-footer').innerText = footerText;
+			});
+			
+				// Shrink old fragments
+			Reveal.on('fragmentshown', function(event) {
+				const currentFragment = event.fragment;
+				const previousFragments = Array.from(currentFragment.parentNode.children)
+					.slice(0, Array.from(currentFragment.parentNode.children).indexOf(currentFragment));
+					previousFragments.forEach(fragment => {
+					fragment.classList.add('shrunk');
+				});
+			});
+
+				// Resize Plotly graph in iframe when slide changes
+			Reveal.addEventListener('slidechanged', function(event) {
+				const iframe = event.currentSlide.querySelector("iframe");
+				if (iframe && iframe.contentWindow && iframe.contentWindow.Plotly) {
+					const graphDiv = iframe.contentWindow.document.getElementById('graph');
+				if (graphDiv) {
+					iframe.contentWindow.Plotly.Plots.resize(graphDiv);
+					}
+				}
+			});
+		</script>
+		
+		<div id="custom-footer" style="
+			position: fixed;
+			bottom: 10px;
+			width: 100%;
+			text-align: center;
+			font-size: 14px;
+			color: indigo;
+			font-family: sans-serif;
+			pointer-events: none;
+			z-index: 99;">
+		</div>
+
+	</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PD Progression Static</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    html, body {
+      background-color: transparent;
+      color: indigo;
+      font-family: sans-serif;
+	  overflow: hidden;
+    }
+    .reveal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100vh;
+    }
+    #graph {
+      width: 90vw;
+      height: 90vh;
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div id="graph"></div>
+  </div>
+
+  <script>
+    const x = Array.from({ length: 41 }, (_, i) => i - 20);
+    const nonMotorSlope = 0.012;
+    const motorStartY = nonMotorSlope * 20;
+    const motorSlope = nonMotorSlope * 2.5 * 1.5;
+    const treatmentStartX = 7;
+    const treatmentStartY = motorStartY + motorSlope * treatmentStartX;
+    const treatmentSlope = motorSlope * 2.1;
+
+    const traces = [
+      {
+        name: "Non-Motor Symptoms",
+        x,
+        y: x.map(val => nonMotorSlope * (val + 20)),
+        mode: "lines",
+        line: { color: "indigo", width: 3 },
+        fill: "tozeroy",
+        fillcolor: "rgba(75, 0, 130, 0.2)"
+      },
+      {
+        name: "Motor Symptoms",
+        x: x.filter(val => val >= 0),
+        y: x.filter(val => val >= 0).map(val => motorStartY + motorSlope * val),
+        mode: "lines",
+        line: { color: "darkblue", width: 3 },
+        fill: "tonexty",
+        fillcolor: "rgba(0, 0, 139, 0.2)"
+      },
+      {
+        name: "Treatment Complications",
+        x: x.filter(val => val >= treatmentStartX),
+        y: x.filter(val => val >= treatmentStartX).map(val => treatmentStartY + treatmentSlope * (val - treatmentStartX)),
+        mode: "lines",
+        line: { color: "darkgreen", width: 3 },
+        fill: "tonexty",
+        fillcolor: "rgba(0, 100, 0, 0.2)"
+      },
+      {
+        x: [2, 2],
+        y: [0, 1.5],
+        mode: "lines",
+        line: { dash: "dash", width: 2, color: "indigo" },
+        showlegend: false
+      }
+    ];
+
+    const annotations = [
+      { x: 3.2, y: .88, text: "Diagnosis Time", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10 } },
+      { x: -14.5, y: 0.18, text: "Gastrointestinal Symptoms", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: -14.5, y: 0.14, text: "Autonomic Dysfunction", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo" , size: 10 } },
+      { x: -5, y: 0.44, text: "Sensory Symptoms", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: -5, y: 0.40, text: "Impaired Olfaction", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: -5, y: 0.36, text: "Vision Anomalies", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: -5, y: 0.29, text: "Sleep Disorder", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: -5, y: 0.25, text: "Depression", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 9, y: 0.06, text: "Pain", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 15.3, y: 0.18, text: "Orthostatic Hypotension", yref: "paper", xref: "x", showarrow: false, font: { color: "indigo", size: 10  } },
+      { x: 15.3, y: 0.14, text: "Urinary Symptoms", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 15.3, y: 0.1, text: "Dysphagia", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 15.3, y: 0.06, text: "Dementia", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 5.2, y: 0.55, text: "Bradykinesia", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 5.2, y: 0.51, text: "Rigidity", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 5.2, y: 0.47, text: "Tremors", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 16.5, y: 0.495, text: "Freezing", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 16.5, y: 0.455, text: "Dysphagia", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 16.5, y: 0.415, text: "Gait Apraxia", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 16.5, y: 0.375, text: "Postural Changes", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 16.5, y: 0.31, text: "Falls", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 16.5, y: 0.275, text: "Dystonia", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 13, y: .86, text: "OCD", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 13, y: .82, text: "Hallucinations", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 13, y: .78, text: "Psychosis", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+      { x: 9, y: 0.65, text: "Dyskinesia", showarrow: false, yref: "paper", xref: "x", font: { color: "indigo", size: 10  } },
+	  {
+		x: -17,
+		y: -0.06,
+		text: "-20 to -10 yrs for PD (-10 to -5 yrs for MSA)",
+		showarrow: false,
+		font: { color: "indigo", size: 10  },
+		xref: "x",
+		yref: "paper"
+	  },
+	  {
+		x: 17,
+		y: -0.06,
+		text: "10 to 20 yrs for PD (5 to 10 yrs for MSA)",
+		showarrow: false,
+		font: { color: "indigo", size: 10  },
+		xref: "x",
+		yref: "paper"
+	  }
+	
+   ];
+
+    const layout = {
+      plot_bgcolor: "rgba(0,0,0,0)",
+      paper_bgcolor: "rgba(0,0,0,0)",
+      xaxis: {
+	    range: [-20, 20],
+        title: { text: "Time (Years)", font: { color: "indigo" } },
+        showticklabels: false,
+        linecolor: "indigo"
+      },
+      yaxis: {
+        title: { text: "Symptom Progression", font: { color: "indigo" } },
+        showticklabels: false,
+        linecolor: "indigo"
+      },
+      annotations: annotations,
+      legend: {
+        orientation: "v",
+		x: .1,
+        y: .9,
+		xanchor: "left",
+		yanchor: "top",
+		bgcolor: "rgba(255, 255, 255, 0.6)",
+        font: { color: "indigo", size: 10 }
+      }
+    };
+
+    Plotly.newPlot("graph", traces, layout, {
+      displayModeBar: false,
+      staticPlot: true
+    });
+  </script>
+</body>
+</html>
+
+
+
+

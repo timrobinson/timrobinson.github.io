@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reveal.js + Plotly</title>
+    <!-- Include Reveal.js CSS and Theme -->
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/reveal.css">
+    <link rel="stylesheet" href="C:\Users\robin\Programs\Proteinopathy\reveal.js\dist\theme\indigo.css">
+    <!-- Include Plotly JS -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+      html, body {
+
+        margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+      }
+      .reveal {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100vh;
+      }
+      #my-plot {
+        width: 105%; /* Stretched graph width */
+        height: 500px; /* Fixed height */
+        margin: 0 auto;
+		transform: translateX(1.75in); /* Move the plot 1 inch to the right */
+      }
+    </style>
+	
+
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <div id="my-plot"></div>
+
+          <script>
+            var x = [];
+            for (var i = -20; i <= 20; i++) x.push(i);
+
+            const nonMotorSlope = 0.012;
+
+            // Non-Motor Symptoms Trace
+            var nonMotor = {
+              x: x,
+              y: x.map(val => nonMotorSlope * (val + 20)),
+              mode: 'lines',
+              name: 'Non-Motor Symptoms',
+              line: { color: 'rgba(255, 182, 193, 1)', width: 3 },
+              fill: 'tozeroy',
+              fillcolor: 'rgba(255, 182, 193, 0.3)',
+              visible: true, // Initially visible
+			  hoverinfo: 'name' // name only information
+            };
+
+            // Motor Symptoms Trace
+            const motorStartY = nonMotorSlope * 20;
+            const motorSlope = nonMotorSlope * 2.5 * 1.5; // 50% increase
+            var motor = {
+              x: x.filter(val => val >= 0),
+              y: x.filter(val => val >= 0).map(val => motorStartY + motorSlope * val),
+              mode: 'lines',
+              name: 'Motor Symptoms',
+              line: { color: 'rgba(173, 216, 230, 1)', width: 3 },
+              fill: 'tonexty',
+              fillcolor: 'rgba(173, 216, 230, 0.3)',
+              visible: 'legendonly', // Initially hidden
+			  hoverinfo: 'name' // name only information
+            };
+
+            // Treatment Complications Trace
+            const treatmentStartX = 7;
+            const treatmentStartY = motorStartY + motorSlope * treatmentStartX;
+            const treatmentSlope = motorSlope * 2.1; // 120% increase
+            var treatment = {
+              x: x.filter(val => val >= treatmentStartX),
+              y: x.filter(val => val >= treatmentStartX).map(val => treatmentStartY + treatmentSlope * (val - treatmentStartX)),
+              mode: 'lines',
+              name: 'Treatment Complications',
+              line: { color: 'rgba(152, 251, 152, 1)', width: 3 },
+              fill: 'tonexty',
+              fillcolor: 'rgba(152, 251, 152, 0.3)',
+              visible: 'legendonly', // Initially hidden
+			  hoverinfo: 'name' // name onlyinformation
+            };
+
+            // Time of Diagnosis Line (linked to Motor Symptoms)
+            var diagnosisLine = {
+              x: [2, 2],
+              y: [0, 1.5],
+              mode: 'lines',
+              line: { color: 'white', dash: 'dash', width: 2 },
+              visible: 'legendonly', // Initially hidden, toggles with Motor Symptoms
+              showlegend: false, // Exclude from legend
+			  hoverinfo: 'none' // Disable hover information
+            };
+
+            // Annotations
+            var nonMotorAnnotations = [
+              { x: -14.5, y: 0.27, text: "Gastrointestinal Symptoms", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+              { x: -14.5, y: 0.2, text: "Autonomic Dysfunction", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+              { x: -5, y: 0.58, text: "Sensory Symptoms", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+              { x: -5, y: 0.51, text: "Impaired Olfaction", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+              { x: -5, y: 0.44, text: "Vision Anomalies", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+              { x: -5, y: 0.37, text: "Sleep Disorder", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+              { x: -5, y: 0.30, text: "Depression", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+              { x: 9, y: 0.04, text: "Pain in Medial Collateral Ligament", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+			  { x: 15.3, y: 0.33, text: "Orthostatic Hypotension", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+			  { x: 15.3, y: 0.26, text: "Urinary Symptoms", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+			  { x: 15.3, y: 0.19, text: "Dysphagia", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } },
+			  { x: 15.3, y: 0.12, text: "Dementia", showarrow: false, font: { color: 'rgba(255, 182, 193, 1)', size: 10 } }
+            ];
+
+            var MotorAnnotations = [
+              { x: 5, y: 0.74, text: "Bradykinesia", showarrow: false, font: { color: 'rgba(173, 216, 230, 1)', size: 10 } },
+              { x: 5, y: 0.67, text: "Rigidity", showarrow: false, font: { color: 'rgba(173, 216, 230, 1)', size: 10 } },
+              { x: 5, y: 0.60, text: "Tremors", showarrow: false, font: { color: 'rgba(173, 216, 230, 1)', size: 10 } },
+              { x: 16, y: 0.85, text: "Freezing", showarrow: false, font: { color: 'rgba(173, 216, 230, 1)', size: 10 } },
+              { x: 16, y: 0.78, text: "Dysphagia", showarrow: false, font: { color: 'rgba(173, 216, 230, 1)', size: 10 } },
+              { x: 16, y: 0.71, text: "Gait's Apraxia", showarrow: false, font: { color: 'rgba(173, 216, 230, 1)', size: 10 } },
+              { x: 16, y: 0.64, text: "Postural Changes", showarrow: false, font: { color: 'rgba(173, 216, 230, 1)', size: 10 } },
+              { x: 16, y: 0.57, text: "Falls", showarrow: false, font: { color: 'rgba(173, 216, 230, 1)', size: 10 } },
+              { x: 16, y: 0.5, text: "Dystonia", showarrow: false, font: { color: 'rgba(173, 216, 230, 1)', size: 10 } }
+            ];
+
+            var treatmentAnnotations = [
+              { x: 12, y: 1.69, text: "Obsessive-Compulsive Disorder", showarrow: false, font: { color: 'rgba(152, 251, 152, 1)', size: 10 } },
+              { x: 12, y: 1.62, text: "Hallucinations", showarrow: false, font: { color: 'rgba(152, 251, 152, 1)', size: 10 } },
+              { x: 12, y: 1.55, text: "Psychosis", showarrow: false, font: { color: 'rgba(152, 251, 152, 1)', size: 10 } },
+              { x: 8, y: .9, text: "Dyskinesia", showarrow: false, font: { color: 'rgba(152, 251, 152, 1)', size: 10 } }
+            ];
+
+            var diagnosisAnnotation = {
+              x: 0,
+              y: 1.55,
+              text: "Diagnosis Time",
+              showarrow: false,
+              font: { color: 'white', size: 10 },
+              xanchor: 'center'
+            };
+
+            // Layout
+            var layout = {
+              title: { text: "Parkinson's Disease Progression", font: { color: 'beige' } },
+              xaxis: { 
+                title: { text: 'Time (20 to 40 Years for PD; 5 to 10 Years for MSA)', font: { color: 'indigo' } },
+                range: [-20, 20],
+				showticklabels: true,
+                linecolor: 'beige'
+              },
+              yaxis: { 
+                title: { text: 'Progression', font: { color: 'beige' } },
+                showticklabels: false,
+                linecolor: 'beige',
+                range: [0, 1.9]
+              },
+              annotations: [...nonMotorAnnotations],
+              legend: { traceorder: 'normal', x: 0.05, y: 1.1, font: { color: 'beige' } },
+              plot_bgcolor: 'indigo',
+              paper_bgcolor: 'indigo'
+            };
+
+            // Combine Traces
+            var data = [nonMotor, motor, treatment, diagnosisLine];
+
+            // Render Plot
+            var myPlot = document.getElementById('my-plot');
+            Plotly.newPlot(myPlot, data, layout, { displayModeBar: false });
+
+            // Legend Click Handling
+            myPlot.on('plotly_legendclick', function(event) {
+              const name = event.data[event.curveNumber].name;
+              var isVisible = event.data[event.curveNumber].visible !== 'legendonly';
+
+              // Handle Motor Symptoms
+              if (name === 'Motor Symptoms') {
+                data[1].visible = isVisible ? 'legendonly' : true; // Toggle Motor Symptoms trace
+                data[3].visible = isVisible ? 'legendonly' : true; // Toggle Diagnosis Line
+                if (!isVisible) {
+                  // Add Motor Annotations and Diagnosis Annotation
+                  layout.annotations = [...layout.annotations, diagnosisAnnotation, ...MotorAnnotations];
+                } else {
+                  // Remove Motor Annotations and Diagnosis Annotation
+                  layout.annotations = layout.annotations.filter(a => !MotorAnnotations.includes(a) && a !== diagnosisAnnotation);
+                }
+              }
+
+              // Handle Treatment Complications
+              else if (name === 'Treatment Complications') {
+                data[2].visible = isVisible ? 'legendonly' : true; // Toggle Treatment Complications trace
+                if (!isVisible) {
+                  // Add Treatment Annotations
+                  layout.annotations = [...layout.annotations, ...treatmentAnnotations];
+                } else {
+                  // Remove Treatment Annotations
+                  layout.annotations = layout.annotations.filter(a => !treatmentAnnotations.includes(a));
+                }
+              }
+
+              Plotly.react(myPlot, data, layout);
+              return false; // Prevent default legend behavior
+            });
+          </script>
+        </section>
+      </div>
+    </div>
+    <script src="https://unpkg.com/reveal.js/dist/reveal.js"></script>
+    <script>Reveal.initialize({ center: true, slideNumber: false, transition: 'fade' });</script>
+  </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

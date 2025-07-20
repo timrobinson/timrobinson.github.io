@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reveal.js Example</title>
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/reveal.css">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/theme/black.css">
+  <style>
+    .fragment {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease-in-out;
+      font-size: 2rem; /* Initial font size */
+    }
+    .fragment.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fragment.shrunk {
+      font-size: 1rem; /* Reduced font size for previous bullets */
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <ul>
+          <li class="fragment">First bullet</li>
+          <li class="fragment">Second bullet</li>
+          <li class="fragment">Third bullet</li>
+          <li class="fragment">Fourth bullet</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+  <script src="https://unpkg.com/reveal.js/dist/reveal.js"></script>
+  <script>
+    Reveal.initialize();
+
+    // Listen for when a fragment is shown
+    Reveal.on('fragmentshown', function(event) {
+      const currentFragment = event.fragment;
+
+      // Reduce font size of all previous fragments
+      const previousFragments = Array.from(currentFragment.parentNode.children)
+        .slice(0, Array.from(currentFragment.parentNode.children).indexOf(currentFragment));
+
+      previousFragments.forEach(fragment => {
+        fragment.classList.add('shrunk');
+      });
+    });
+  </script>
+</body>
+</html>
+

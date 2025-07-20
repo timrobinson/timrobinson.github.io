@@ -1,0 +1,13 @@
+:root {
+    --dt-background: indigo !important; /* Override the default background variable */
+}
+
+.yYWAMb {
+    background-color: indigo !important; /* Force background color */
+}
+
+.tl-media-content-container, .tl-media-content {
+    background-color: indigo !important; /* Add styles for Timeline.js containers */
+    border: none !important;
+    box-shadow: none !important;
+}
