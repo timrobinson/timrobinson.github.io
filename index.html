@@ -28,7 +28,7 @@
 
   /* Fix: iframe rule must be separate */
 		iframe {
-			background-color: indigo;
+			background-color: transparent;
 		}
 
   /* New class for fade-in then fade-out behavior */
@@ -152,6 +152,22 @@
 
     <!-- Theme used for syntax highlighted code -->
     <link rel="stylesheet" href="plugin/highlight/monokai.css">
+	
+    <style>
+      /* Make the “Dysbiosis” sub‑slide fill its column entirely */
+      .reveal .slides > section > section[data-footer="Triggers - Slide 2 of x"].present {
+        /* position it at the top‐left of its wrapper */
+        top: 0 !important;
+        left: 0 !important;
+
+        /* span the full width & height of the column */
+        width: 100% !important;
+        height: 100% !important;
+
+        /* remove any centering transforms */
+        transform: none !important;
+      }
+    </style>
 
 </head>
 
@@ -304,23 +320,37 @@
 					
 								
 					
-					<section data-footer="Triggers - Slide 2 of x"
-							 style="display:flex; flex-direction:column; /* make the slide stretch */">
-						<h3 style ="color: indigo; text-align:center; margin-bottom:1rem;">Dysbiosis</h3>
-						<div style="flex:1; /* fill the rest of the slide */">
-							<iframe 
-								src="side_by_side_microbiome_sunburst.html" 
-								style="
-									width: 100%;
-									height: 100%;
-									border: none;
-									display: block;
-									"
-								allowtransparency="true"
-								scrolling="no">
-							</iframe>
-						</div>
-					</section>	
+<!-- 
+<section data-footer="Triggers - Slide 2 of x"
+         style="display:flex; flex-direction:column; height: 100vh; padding: 0">
+  <h3 style ="color: indigo; text-align:center; margin-bottom:1rem;">Dysbiosis</h3>
+  <div style="flex:1; min-height: 0"> 
+    <iframe 
+      src="side_by_side_microbiome_sunburst.html" 
+      style="
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;"
+        allowtransparency="true"
+        scrolling="no">
+    </iframe>
+  </div>
+</section>
+-->
+<section data-footer="Triggers - Slide 2 of x" style="padding: 0; position: relative;">
+	<h3 style ="color: indigo; text-align:center; margin-bottom:1rem;">Dysbiosis</h3>
+  <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
+    <iframe 
+      src="side_by_side_microbiome_sunburst.html" 
+      style="width: 100%; height: 100%; border: none;" 
+      allowtransparency="true" 
+      scrolling="no">
+    </iframe>
+  </div>
+</section>
+
+
 				</section>	
 				
 				<section>
@@ -407,7 +437,7 @@
 			Reveal.initialize({
 				controls: true,
 				progress: true,
-				center: true,
+				center: false,
 				hash: true,
 				plugins: [ RevealNotes, RevealMarkdown, RevealHighlight ]
 			});

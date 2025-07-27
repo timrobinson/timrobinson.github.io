@@ -8,12 +8,37 @@
     
 </head>
 <body >
-    <style>.box { justify-content:center; display:flex; flex-wrap:wrap;  } </style>
+    <style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			height: 100%;               /* let the iframe’s full height propagate down */
+		}
+		.box {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			gap: 10px;
+			height: 100%;               /* take all of that 100% */
+			padding-top: 1rem;          /* breathe room under your title */
+		}
+		.chart-container {
+			flex: 1 1 0;                /* two per row */
+			height: 100%;               /* fill the full height of .box */
+			background-color: transparent;
+			position: relative;         /* for ECharts canvas absolute‐position hack */
+		}
+		.chart-container canvas {
+			position: absolute;
+			top: 0; left: 0;
+			width: 100%; height: 100%;
+		}
+	</style>
     <div class="box">
-                <div id="0924241e957c464bb67f12f60f2f417e" class="chart-container" style="width:900px; height:500px; "></div>
+                <div id="0924241e957c464bb67f12f60f2f417e" class="chart-container"></div>
     <script>
         var chart_0924241e957c464bb67f12f60f2f417e = echarts.init(
-            document.getElementById('0924241e957c464bb67f12f60f2f417e'), 'white', {renderer: 'canvas'});
+            document.getElementById('0924241e957c464bb67f12f60f2f417e'), 'white', {renderer: 'canvas', backgroundColor: 'transparent'});
         var option_0924241e957c464bb67f12f60f2f417e = {
     "animation": true,
     "animationThreshold": 2000,
@@ -339,11 +364,11 @@
             ],
             "center": [
                 "50%",
-                "50%"
+                "60%"
             ],
             "radius": [
                 0,
-                "95%"
+                "90%"
             ],
             "highlightPolicy": "descendant",
             "nodeClick": "rootToNode",
@@ -353,7 +378,7 @@
             "startAngle": 90,
             "label": {
                 "show": true,
-                "color": "black",
+                "color": "indigo",
                 "margin": 8,
                 "valueAnimation": false
             },
@@ -416,6 +441,8 @@
         {
             "show": true,
             "text": "Healthy Gut Microbiome",
+			"top": 140,
+			"textStyle": {color:'indigo'},
             "target": "blank",
             "subtarget": "blank",
             "padding": 5,
@@ -428,10 +455,10 @@
 };
         chart_0924241e957c464bb67f12f60f2f417e.setOption(option_0924241e957c464bb67f12f60f2f417e);
     </script>
-<br/>                <div id="9e66a3a21b46403a9be9360357a9f905" class="chart-container" style="width:900px; height:500px; "></div>
+		<div id="9e66a3a21b46403a9be9360357a9f905" class="chart-container"></div>
     <script>
         var chart_9e66a3a21b46403a9be9360357a9f905 = echarts.init(
-            document.getElementById('9e66a3a21b46403a9be9360357a9f905'), 'white', {renderer: 'canvas'});
+            document.getElementById('9e66a3a21b46403a9be9360357a9f905'), 'white', {renderer: 'canvas', backgroundColor: 'transparent'});
         var option_9e66a3a21b46403a9be9360357a9f905 = {
     "animation": true,
     "animationThreshold": 2000,
@@ -748,11 +775,11 @@
             ],
             "center": [
                 "50%",
-                "50%"
+                "60%"
             ],
             "radius": [
                 0,
-                "95%"
+                "90%"
             ],
             "highlightPolicy": "descendant",
             "nodeClick": "rootToNode",
@@ -762,7 +789,7 @@
             "startAngle": 90,
             "label": {
                 "show": true,
-                "color": "black",
+                "color": "indigo",
                 "margin": 8,
                 "valueAnimation": false
             },
@@ -825,6 +852,8 @@
         {
             "show": true,
             "text": "Parkinson's Disease Microbiome",
+			"top": 140,
+			"textStyle": {color:'indigo'},
             "target": "blank",
             "subtarget": "blank",
             "padding": 5,
@@ -837,6 +866,24 @@
 };
         chart_9e66a3a21b46403a9be9360357a9f905.setOption(option_9e66a3a21b46403a9be9360357a9f905);
     </script>
+	
+	<script>
+  // expose them to the iframe’s window
+		window.chart1 = chart_0924241e957c464bb67f12f60f2f417e;
+		window.chart2 = chart_9e66a3a21b46403a9be9360357a9f905;
+
+  // 1) redraw once after a tiny delay (when the iframe actually gets its height)
+		setTimeout(() => {
+			chart1.resize();
+			chart2.resize();
+		}, 100);
+
+  // 2) and also on any window.resize (just in case)
+		window.addEventListener('resize', () => {
+			chart1.resize();
+			chart2.resize();
+		});
+</script>
 <br/>    </div>
     <script>
     </script>
