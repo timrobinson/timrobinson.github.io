@@ -154,6 +154,15 @@
       displayModeBar: false,
       staticPlot: true
     });
+	
+	window.addEventListener('load', () => {
+    // Trigger a redraw or resize of the graph
+		if (typeof Plotly !== 'undefined') {
+		Plotly.Plots.resize(document.getElementById('graph'));
+		}
+	});
+</script>
+
   </script>
 </body>
 </html>
