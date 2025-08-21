@@ -141,6 +141,20 @@
 			transform: scale(0.8);       /* Adjust to fit your screen */
 			transform-origin: top left;  /* Keeps slides aligned */
 		}
+		
+		ul.sublist > li {
+			list-style-type: none !important;
+			position: relative;
+			padding-left: 1em; /* Optional: space for custom bullet */
+		}
+
+		ul.sublist > li::before {
+			content: ""; /* Empty to remove bullet */
+			position: absolute;
+			left: 0;
+		}
+
+
 
 	</style>
   
@@ -192,9 +206,22 @@
 						<h3 style="color: indigo">Index</h3>
 						<ul style="color: indigo">
 							<li>Background</li>
+							<ul class = "sublist">
+								<li><span style="font-size:0.55em;">Baseline understanding, clinical progression, and why early detection matters</span></li>
+							</ul>
 							<li>Triggers</li>
-							<li>Chronic Inflammation Drivers</li>
-							<li>Discussion</li>						
+							<ul class = "sublist">
+								<li><span style="font-size:0.55em;">Gut, brain (both intrinsic and extrinsic), and DRG</span></li>
+							</ul>
+							<li>Pathogenesis/Sustainers</li>
+							<ul class = "sublist">							
+								<li><span style="font-size:0.55em;">Chronic inflammation, ER stress, mitochondrial dysfunction, ERVs, proteostasis collapse</span></li>
+							</ul>
+							<li>Morphological Outcomes</li>
+							<ul class = "sublist">
+								<li><span style="font-size:0.55em;">a-syn aggregates (GCIs vs. LBs), neurotransmitter deficit, loss of glial cell support</span></li>
+							</ul>
+							<li>Wrap-up
 						</ul>
 					</section>
 					
@@ -208,11 +235,16 @@
 					}
 				</style>
 
-					<section data-footer="Background - Slide 1 of 4">
+					<section data-footer="Background - Slide 1 of X">
 						<h3 style="color: indigo" class="indigo-text">Background</h3>
 						<ul class="indigo-text" style="font-size: 90%; line-height: 1.5em;">
-    
-							<li class="fragment fade-in-then-out" data-fragment-index="0">
+					</section>
+					
+					
+					<section data-footer="Background - Slide 2 of X">
+						<h3 style="color: indigo" class="indigo-text">Background</h3>
+						<ul class="indigo-text" style="font-size: 90%; line-height: 1.5em;">
+							<li class="fragment fade-out" data-fragment-index="0">
 								<div style="line-height: 1.2;">
 									Parkinsonism refers to a group of neurodegenerative diseases that share overlapping motor symptoms and some pathological features. These include <span class="bold-text">Parkinson’s Disease (PD)</span>, <span class="bold-text">Multiple System Atrophy (MSA)</span>, and <span class="bold-text">Lewy Body Dementia (LBD)</span>.
 								</div>
@@ -241,6 +273,7 @@
 						</ul>
 					</section>
 
+<!--
 
 					<section data-footer="Background - Slide 2 of 4">
 						<h3 style="color: indigo; margin-bottom: 1em;" class="indigo-text">Parkinsonism/Synucleinopathy Spectrum</h3>
@@ -272,8 +305,9 @@
 						</table>
 						</u>
 					</section>
+-->
 				
-					<section data-footer="Background - Slide 3 of 4">
+					<section data-footer="Background - Slide 3 of X">
 						<h3 style="color: indigo; font-size: 34px;" class="indigo-text">General Model of Parkinsonism Progression: Prodromal and Post-Prodromal Phases</h3>
 							<iframe 
 								src="new 1.html" 
