@@ -1,429 +1,381 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reveal + Fullbleed Iframe</title>
 
-    <title>reveal.js</title>
+  <link rel="stylesheet" href="dist/reset.css" />
+  <link rel="stylesheet" href="dist/reveal.css" />
+  <link rel="stylesheet" href="dist/theme/beige.css" id="theme" />
 
-    <link rel="stylesheet" href="dist/reset.css">
-    <link rel="stylesheet" href="dist/reveal.css">
-    <link rel="stylesheet" href="dist/theme/beige.css">
-	<style>
-		.fragment {
-			opacity: 0;
-			transform: translateY(20px);
-			transition: all 0.5s ease-in-out;
-			font-size: 2rem; /* Initial font size */
-		}
+  <style>
+    :root { --footer-h: 50px; } /* JS will update this */
 
-		.fragment.visible {
-			opacity: 1;
-			transform: translateY(0);
-		}
+    /* Let the deck height exclude the footer */
+    .reveal {
+      height: calc(100vh - var(--footer-h));
+      box-sizing: border-box;
+    }
+    .reveal .slides { height: 100%; }
 
-		.fragment.shrunk {
-			font-size: 1.5rem; /* Reduced font size for previous bullets */
-		}
+	/* Overlay stack for superimposed PNGs */
+	.overlay-container{
+		position: relative;
+		width: 60vw;                /* adjust as you like */
+		aspect-ratio: 4355 / 2205;  /* or set a fixed height instead */
+		margin: 0 auto;
+		overflow: hidden;
+		display: block;
+	}
 
-  /* Fix: iframe rule must be separate */
-		iframe {
-			background-color: transparent;
-		}
+	.overlay-container img{
+		position: absolute;
+		inset: 0;                   /* top:0; right:0; bottom:0; left:0 */
+		width: 100%;
+		height: 100%;
+		object-fit: contain;        /* keep image proportions */
+		margin: 0 !important;       /* override theme margins */
+		border: 0 !important;       /* just in case theme adds one */
+		box-shadow: none !important;
+	}
 
-  /* New class for fade-in then fade-out behavior */
-		.fade-in-then-out {
-			opacity: 0;
-			transition: all 0.6s ease;
-		}
-
-		.visible .fade-in-then-out.visible {
-			opacity: 1;
-		}
-
-		.fragment.fade-in-then-out.visible {
-			opacity: 1;
-			transform: translateY(0) scale(1);
-		}
-
-		.visible .fade-in-then-out.visible:not(.current-fragment) {
-			opacity: 0;
-			transform: scale(0.95);
-		}
-			
-  /* 1) overlay that will fade-in over the images */
-		.fade-out-all {
-			position: absolute;
-			top: 0; left: 0;
-			width: 100%; height: 100%;
-			background: radial-gradient(
-				circle at center,
-				 rgba(255,255,255,1),
-				 rgba(249,245,222,1) 
-				);
-			opacity: 0;
-			transition: opacity 0.6s ease;
-			z-index: 10;
-		}
-		
-  /* when its fragment becomes 'visible', it fades in */
-		.fragment.fade-out-all.visible {
-			opacity: 1;
-		}		
-		
-
-  /* your new content layer */
-		.new-content {
-			position: absolute;
-			top: 0; left: 0;
-			width: 100%; height: 100%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			opacity: 0;
-			transition: opacity 0.6s ease;
-			z-index: 11;
-		}
-		
-  /* when triggered, fade it in */
-		.fragment.new-content.visible {
-			opacity: 1;
-		}		
-
-  /* New class for fade-in image behavior */			
-		.overlay-container {
-			position: relative;
-			width: 60vw;
-			aspect-ratio: 4355 / 2205;
-			margin: 0 auto;
-			overflow: hidden;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-
-		.overlay-container img {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: auto;
-			object-fit: contain;
-			margin: 0;
-			padding: 0;
-			border: none;
-		}
-
-		.fade-step {
-			opacity: 0;
-			transition: opacity 0.6s ease;
-		}
-
-		.fragment.fade-step.visible {
-			opacity: 1;
-		}
-		
-  /* New class for custom footer */		
-		.my-footer {
-			position: fixed;
-			bottom: 0;
-			left: 0;
-			width: 100%;
-			background-color: rgba(0, 0, 0, 0.5);
-			color: white;
-			padding: 10px;
-			text-align: center;
-			font-size: 0.7em;
-		}
-		
-  /* New class for shrinking Overview Mode */				
-		.reveal.overview .slides section {
-			transform: scale(0.8);       /* Adjust to fit your screen */
-			transform-origin: top left;  /* Keeps slides aligned */
-		}
-		
-		ul.sublist > li {
-			list-style-type: none !important;
-			position: relative;
-			padding-left: 1em; /* Optional: space for custom bullet */
-		}
-
-		ul.sublist > li::before {
-			content: ""; /* Empty to remove bullet */
-			position: absolute;
-			left: 0;
-		}
-
-
-
-	</style>
-  
-	<style>
-		.bold-text {
-			font-weight: 800;
-		}
-	</style>
-
-    <!-- Theme used for syntax highlighted code -->
-    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+    /* Full-bleed slide: title row + stretchy content row */
+    section.fullbleed {
+      display: grid;
+      grid-template-rows: min-content minmax(0, 1fr);
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
 	
-    <style>
-      /* Make the “Dysbiosis” sub‑slide fill its column entirely */
-      .reveal .slides > section > section[data-footer="Gateway - Slide 2 of x"].present {
-        /* position it at the top‐left of its wrapper */
-        top: 0 !important;
-        left: 0 !important;
+	/* Pack grid rows at the very top of the slide */
+	section.fullbleed {
+		align-content: start;            /* key: keeps the title row at the top */
+	}
 
-        /* span the full width & height of the column */
-        width: 100% !important;
-        height: 100% !important;
+	/* Neutralize any Reveal vertical centering on this slide */
+	.reveal .slides section.fullbleed.present {
+		top: 0 !important;
+		transform: none !important;      /* kill translate(-50%, -50%) if applied */
+	}
 
-        /* remove any centering transforms */
-        transform: none !important;
-      }
-    </style>
+    section.fullbleed > h3 {
+	  margin-top: -1rem;   /* pull upward */
+	  margin-bottom: 0.2rem;
+      line-height: 1.1;
+      text-align: center;
+      color: indigo;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+    section.fullbleed .r-stretch {
+      min-height: 0;
+      min-width: 0;
+      overflow: hidden;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    section.fullbleed .r-stretch > iframe {
+      width: 100%;
+      height: 100%;
+      border: none !important;
+      display: block;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
 
+    /* Global: kill any theme separators on headings/sections */
+    .reveal .slides h1,
+    .reveal .slides h2,
+    .reveal .slides h3 {
+      border: 0 !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+    .reveal,
+    .reveal .slides,
+    .reveal .slides section {
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      outline: 0 !important;
+    }
+
+    /* Footer itself */
+#custom-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+
+  height: var(--footer-h);
+  line-height: var(--footer-h);
+  overflow: hidden;
+
+  text-align: center;
+  color: indigo;
+  font: 14px system-ui, sans-serif;
+
+  pointer-events: none;
+  z-index: 99;
+
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  /* outline: 1px dashed red;  // debug if you want */
+}
+
+/* Slide area excludes the footer height */
+.reveal {
+  height: calc(100vh - var(--footer-h));
+  box-sizing: border-box;
+}
+
+
+    /* If you still ever see a “gray line”, hide Reveal’s progress bar */
+    .reveal .progress { display: none !important; }
+	
+	#logo {
+		position: fixed;
+		top: 12px;       /* distance from top */
+		right: 12px;     /* distance from right */
+		width: 80px;     /* logo size */
+		height: 80px;
+		background: url('pngegg.png') no-repeat center center;
+		background-size: contain;
+		z-index: 1000;   /* above slide content, below controls */
+		pointer-events: none; /* clicks pass through */
+}
+
+	section.title-slide {
+		display: flex;
+		align-items: center;   /* vertical center */
+		justify-content: center; /* horizontal center */
+		text-align: center;
+		height: 100%;
+		padding-top: 25%;
+	}
+
+	section.title-slide h3 {
+		font-size: 4.5rem;   /* larger */
+		margin: 0;
+	}
+	
+.reveal .controls {
+  position: fixed !important;   /* pin to viewport */
+  top: 50% !important;          /* vertical middle */
+  bottom: auto !important;
+  right: 12px !important;       /* keep near the right edge */
+  transform: translateY(-50%) !important; /* perfect centering */
+  margin: 0 !important;
+  z-index: 1001 !important;
+}
+
+
+
+
+
+  </style>
 </head>
 
+<body>
+	<div id="logo"></div>
+	<div class="reveal">
+		<div class="slides">
+		
+		 <!-- 1) Title slide (first column) -->
+		<section class="title-slide">
+			<h3 style="color: indigo">Parkinsonism Briefing/Discussion</h3>
+		</section>
 
-		<body>
-			<div id="myLogo" style="background: url(pngegg.png);
-                        position: absolute;
-                        bottom: 900px;
-                        right: 10px;
-                        width: 100px;
-                        height: 100px;
-                        background-size: contain;
-                        background-repeat: no-repeat;"></div>
-			<div class="reveal">
-				<div class="slides">
-					<section class="title-slide">
-						<h3 style="color: indigo">Parkinsonism Briefing/Discussion</h3>
-					</section>
-				
-					<section>
-						<h3 style="color: indigo">Index</h3>
-						<ul style="color: indigo">
-							<li>Background</li>
-							<ul class = "sublist">
-								<li><span style="font-size:0.55em;">Current state of Parkinsonism, clinical progression, and pathology overview</span></li>
-							</ul>
-							<li>Gateways</li>
-							<ul class = "sublist">
-								<li><span style="font-size:0.55em;">Gut-first, brain-first (both intrinsic and extrinsic), and DRG-first</span></li>
-							</ul>
-							<li>Pathogenesis/Sustainers</li>
-							<ul class = "sublist">							
-								<li><span style="font-size:0.55em;">Chronic inflammation, ER stress, mitochondrial dysfunction, ERVs, proteostasis collapse</span></li>
-							</ul>
-							<li>Morphological Outcomes</li>
-							<ul class = "sublist">
-								<li><span style="font-size:0.55em;">a-syn aggregates (GCIs vs. LBs), neurotransmitter deficit, loss of glial cell support</span></li>
-							</ul>
-							<li>Wrap-up
-						</ul>
-					</section>
-					
-				<section>
-				<style>
-					.bold-text {
+		 <!-- 1) Index slide (second column) -->		
+		<section>
+			<h3 style="color: indigo">Index</h3>
+			<ul style="color: indigo">
+			<li>Background
+				<ul class="sublist">
+					<li><span style="font-size:0.55em;">Current state of Parkinsonism, clinical progression, and pathology overview</span></li>
+				</ul>
+			</li>
+			<li>Gateways
+				<ul class="sublist">
+					<li><span style="font-size:0.55em;">Gut-first, brain-first (both intrinsic and extrinsic), and DRG-first</span></li>
+				</ul>
+			</li>
+			<li>Pathogenesis/Sustainers
+				<ul class="sublist">
+					<li><span style="font-size:0.55em;">Chronic inflammation, ER stress, mitochondrial dysfunction, ERVs, proteostasis collapse</span></li>
+				</ul>
+			</li>
+			<li>Morphological Outcomes
+				<ul class="sublist">
+					<li><span style="font-size:0.55em;">a-syn aggregates (GCIs vs. LBs), neurotransmitter deficit, loss of glial cell support</span></li>
+				</ul>
+			</li>
+			<li>Wrap-up</li>
+		</section>
+		
+		
+		<section>
+		
+			<style>
+				.bold-text {
 					font-weight: bold;
 					}
 					.indigo-text {
 					color: indigo;
 					}
-				</style>
-
-					<section data-footer="Background - Slide 1 of X">
-						<h3 style="color: indigo" class="indigo-text">Background</h3>
-						<ul class="indigo-text" style="font-size: 90%; line-height: 1.5em;">
-					</section>
-					
-					
-					<section data-footer="Background - Slide 2 of X">
-						<h3 style="color: indigo" class="indigo-text">Background</h3>
-						<ul class="indigo-text" style="font-size: 90%; line-height: 1.5em;">
-							<li class="fragment fade-out" data-fragment-index="0">
-								<div style="line-height: 1.2;">
-									Parkinsonism refers to a group of neurodegenerative diseases that share overlapping motor symptoms and some pathological features. These include <span class="bold-text">Parkinson’s Disease (PD)</span>, <span class="bold-text">Multiple System Atrophy (MSA)</span>, and <span class="bold-text">Lewy Body Dementia (LBD)</span>.
-								</div>
-							</li>
-
-							<li class="fragment fade-in-then-out" data-fragment-index="1">
-								<div style="line-height: 1.2;">
-									<span class="bold-text">LBD</span> affects ~1.4 million people in the U.S. <br>
-									<span class="bold-text">PD</span> affects ~1 million people. <br>
-									<span class="bold-text">MSA</span> is rare—fewer than 50,000 cases (designated an <span class="bold-text">Orphan Disease</span>).
-								</div>
-							</li>					
-
-							<li class="fragment fade-in-then-out" data-fragment-index="2">
-								<div style="line-height: 1.2;">
-									Generally they have a long <span class="bold-text">prodromal</span> period, but after <span class="bold-text">Central Nervous System</span> involvement, the progression rates are significantly different.
-								</div>
-							</li>
-
-							<li class="fragment fade-in-then-out" data-fragment-index="3">
-								<div style="line-height: 1.2;">
-								    Today's main therapy—<span class="bold-text">Levodopa</span>—was FDA approved <span class="bold-text">in 1975 - YIKES!</span>.
+			</style>
+								
+			<section data-footer="Background - Slide 1 of 3">
+				<h3 style="color: indigo" class="indigo-text">Background</h3>
+				<ul class="indigo-text" style="font-size: 80%; line-height: 1.5em;">
+				<li class="fragment fade-in-then-out" data-fragment-index="0">
+					<div style="line-height: 1.2;">
+						Parkinsonism refers to a group of neurodegenerative diseases that share overlapping motor symptoms and some pathological features. These include <span class="bold-text">Parkinson’s Disease (PD)</span>, <span class="bold-text">Multiple System Atrophy (MSA)</span>, and <span class="bold-text">Lewy Body Dementia (LBD)</span>.
+					</div>
+				</li>
+				<li class="fragment fade-in-then-out" data-fragment-index="1">
+					<div style="line-height: 1.2;">
+						<span class="bold-text">LBD</span> affects ~1.4 million people in the U.S. <br>
+						<span class="bold-text">PD</span> affects ~1 million people. <br>
+						<span class="bold-text">MSA</span> is rare—fewer than 50,000 cases (designated an <span class="bold-text">Orphan Disease</span>).
+					</div>
+				</li>					
+				<li class="fragment fade-in-then-out" data-fragment-index="2">
+					<div style="line-height: 1.2;">
+						Generally they have a long <span class="bold-text">prodromal</span> period, but after <span class="bold-text">Central Nervous System</span> involvement, the progression rates are significantly different.
+					</div>
+				</li>
+				<li class="fragment fade-in-then-out" data-fragment-index="3">
+					<div style="line-height: 1.2;">
+						Today's main therapy—<span class="bold-text">Levodopa</span>—was FDA approved <span class="bold-text">in 1975 - YIKES!</span>.
 									It’s still the standard for PD, often used in MSA, and sometimes used in LBD.
-								</div>
-							</li>
-						</ul>
-					</section>
+					</div>
+				</li>
+				</ul>
+			</section>
+			
+			<section class="fullbleed" data-footer="Background - Slide 2 of 3">
+				<h3 style="color: indigo; font-size: 34px;">General Model of Parkinsonism Progression: Prodromal and Post-Prodromal Phases</h3>
 
-<!--
+				<div class="r-stretch">
+				<iframe
+					src="new 1.html"
+					scrolling="no"
+					style="border:none; background:transparent; display:block; width:100%; height:100%;">
+				</iframe>
+				</div>
 
-					<section data-footer="Background - Slide 2 of 4">
-						<h3 style="color: indigo; margin-bottom: 1em;" class="indigo-text">Parkinsonism/Synucleinopathy Spectrum</h3>
-						<ul style="color: indigo">
-						<table>
-							<tr>
-								<th style="font-size: 24px;"><span class="bold-text">Feature/Aspect</span></th>
-								<th style="font-size: 24px;"><span class="bold-text">Parkinson's Disease</span></th>
-								<th style="font-size: 24px;"><span class="bold-text">Multiple System Atrophy</span></th>
-								<th style="font-size: 24px;"><span class="bold-text">Lewy Body Dementia</span></>
-							</tr>
-						
-							<tr>
-								<td style="font-size: 24px;"><span class="bold-text">Select Clinical Presentation</span></td>
-								<td style="font-size: 20px;">Motor dysfunction, gradual progression post diagnosis</td>
-								<td style="font-size: 20px;">Autonomic dysfunction, motor dysfunction, rapid progression post diagnosis</td>
-								<td style="font-size: 20px;">Cognitive symptoms, hallucinations</td>
-							</tr>
-						
-							<tr>
-								<td style="font-size: 24px;"><span class="bold-text">Pathology Highlights</span></td>
-								<td colspan="3" style="font-size: 20px;">Protein toxicity (starts with misfolded alpha-synuclein and progresses to insoluble aggregates), chronic neuro-inflammation, occurs in cells with high mitochondria density</td>
-							</tr>
-						
-							<tr>
-								<td style="font-size: 24px;"><span class="bold-text">Contemporary Models</span></td>
-								<td colspan="3" style="font-size: 20px;">Triggers such as pathogens, environmental toxins,and possibly type 2 diabetes fall into one of three models referred to as 'Body-First', 'Brain-First' and possibly 'Dorsal Root Ganglion First'</td>
-							</tr>
-						</table>
-						</u>
-					</section>
--->
-				
-					<section data-footer="Background - Slide 3 of X">
-						<h3 style="color: indigo; font-size: 34px;" class="indigo-text">General Model of Parkinsonism Progression: Prodromal and Post-Prodromal Phases</h3>
-							<iframe 
-								src="new 1.html" 
-								width="100%" 
-								height=500
-								style="border:none; background: transparent;" 
-								allowtransparency="true">
-							</iframe>
-							<p style="font-size: 12px; color: indigo; text-align: right; margin-top: 4px;">
-								Adapted from: Kalia LV, Lang AE. <i>Parkinson’s disease</i>. Lancet. 2015;386(9996):896–912. 
-								<a href="https://doi.org/10.1016/S0140-6736(14)61393-3" target="_blank" style="color: indigo;">https://doi.org/10.1016/S0140-6736(14)61393-3</a>
-							</p>
-					</section>	
-				
-					<section data-footer="Background - Slide 4 of 4">
-						<div style="display: flex; flex-direction: column; align-items: center;">
-							<h3 style="color: indigo"; class="indigo-text">Parkinsonism Pathology</h3>
-							<div class="overlay-container">				
-								<img data-src="base.png" alt="Base Image">
-								<img data-src="box1.png" class="fragment fade-step" data-fragment-index="0" alt="Box 1">
-								<img data-src="box2.png" class="fragment fade-step" data-fragment-index="1" alt="Box 2">
-								<img data-src="box3.png" class="fragment fade-step" data-fragment-index="2" alt="Box 3">
-								<img data-src="box4.png" class="fragment fade-step" data-fragment-index="3" alt="Box 4">
-							</div>
-						</div>
-					</section>
+				<p style="font-size:12px; color:indigo; text-align:right; margin-top:4px;">
+					Adapted from: Kalia LV, Lang AE. <i>Parkinson’s disease</i>. Lancet. 2015;386(9996):896–912.
+					<a href="https://doi.org/10.1016/S0140-6736(14)61393-3" target="_blank" style="color: indigo;">https://doi.org/10.1016/S0140-6736(14)61393-3</a>
+				</p>
+			</section>
+			
+			<section data-footer="Background - Slide 3 of 3">
+				<div style="display: flex; flex-direction: column; align-items: center;">
+				<h3 style="color: indigo"; class="indigo-text">Parkinsonism Pathway</h3>
+					<div class="overlay-container">				
+						<img src="base.png" alt="Base Image">
+						<img src="box1.png" class="fragment fade-step" data-fragment-index="0" alt="Box 1">
+						<img src="box2.png" class="fragment fade-step" data-fragment-index="1" alt="Box 2">
+						<img src="box3.png" class="fragment fade-step" data-fragment-index="2" alt="Box 3">
+						<img src="box4.png" class="fragment fade-step" data-fragment-index="3" alt="Box 4">
+					</div>
+				</div>
+			</section>
+			
+			<section class="hide-in-presentation overview-align-background" data-footer="Background - Bonus">
+				<div style="position: relative; padding-bottom: 75%; height: 0; overflow: hidden;">
+				<iframe src="https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=1nc1AmCGVeYvWKCsUK-RoPmd7edOBzMuWDLVsUuCPpzY&font=Default&lang=en&initial_zoom=2&height=650"
+					style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+					frameborder="0"
+					allowfullscreen>
+				</iframe>
+				</div>
+			</section>	
 					
-					<section class="hide-in-presentation overview-align-background" data-footer="Background - Bonus">
-						<div style="position: relative; padding-bottom: 75%; height: 0; overflow: hidden;">
-							<iframe src="https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=1nc1AmCGVeYvWKCsUK-RoPmd7edOBzMuWDLVsUuCPpzY&font=Default&lang=en&initial_zoom=2&height=650"
-								style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
-								frameborder="0"
-								allowfullscreen>
-							</iframe>
-						</div>
-					</section>	
-					
-				</section>
-						
-				<section>
-					<section data-footer="Gateway - Slide 1 of x">
-						<h3 style="color: indigo; margin-bottom: 70px;">Gateways</h3>
-						<div style="display: flex; justify-content: flex-start; gap: 40px; transform: translateX(-5%); margin-top: 20px;"></div>
-						<ul class="indigo-text" style="font-size: 24px line-height: 1.5em;">
+		</section>
+		
+		
+		<section>
+			<section data-footer="Gateway - Slide 1 of x">
+				<h3 style="color: indigo; margin-bottom: 70px;">Gateways</h3>
+				<div style="display: flex; justify-content: flex-start; gap: 40px; transform: translateX(-5%); margin-top: 20px;"></div>
+				<ul class="indigo-text" style="font-size: 80%; line-height: 1.5em;">
     
-							<li class="fragment fade-in-then-out" data-fragment-index="0">
-								<div style="line-height: 1.2;">
-									Gut-First, Dysbiosis, Leaky-Gut, Pathobiont.
-								</div>
-							</li>
+					<li class="fragment fade-in-then-out" data-fragment-index="0">
+						<div style="line-height: 1.2;">
+							Gut-First, Dysbiosis, Leaky-Gut, Pathobiont.
+						</div>
+					</li>
 
-							<li class="fragment fade-in-then-out" data-fragment-index="1">
-								<div style="line-height: 1.2;">
-									Brain-First, Pathogens, Neurotoxins, Nasal Cavity.
-								</div>
-							</li>					
+					<li class="fragment fade-in-then-out" data-fragment-index="1">
+						<div style="line-height: 1.2;">
+							Brain-First, Pathogens, Neurotoxins, Nasal Cavity.
+						</div>
+					</li>					
 
-							<li class="fragment fade-in-then-out" data-fragment-index="2">
-								<div style="line-height: 1.2;">
-									Dorsal Root Ganglion-First, Diabetes (T2D).
-								</div>
-							</li>
+					<li class="fragment fade-in-then-out" data-fragment-index="2">
+						<div style="line-height: 1.2;">
+							Dorsal Root Ganglion-First, Diabetes (T2D).
+						</div>
+					</li>
 
-							<li class="fragment fade-in-then-out" data-fragment-index="3">
-								<div style="line-height: 1.2;">
-								    The prodromal and post-prodromal progression rate is influenced by the gateway.
-								</div>
-							</li>
-						</ul>
-					</section>
+					<li class="fragment fade-in-then-out" data-fragment-index="3">
+						<div style="line-height: 1.2;">
+							The prodromal and post-prodromal progression rate is influenced by the gateway.
+						</div>
+					</li>
+					</ul>
+				</section>
 					
-					<section data-footer="Gateway - Slide 2 of x" style="padding: 0; position: relative;">	
-						<h3 style ="color: indigo; text-align:center; margin-bottom:1rem;">Gut-First</h3>
-						<div style="display: flex; justify-content: flex-start; gap: 40px; transform: translateX(-5%); margin-top: 20px;"></div>
-						<ul class="indigo-text" style="font-size: 24px line-height: 1.5em;">
+				<section data-footer="Gateway - Slide 2 of x" style="padding: 0; position: relative;">
+					<h3 style="color: indigo; text-align:center; margin-bottom:1rem;">Gut-First</h3>
+					<div style="display: flex; justify-content: flex-start; gap: 40px; transform: translateX(-5%); margin-top: 20px;"></div>
+					<ul class="indigo-text" style="font-size: 80%; line-height: 1.5em;">
+					
+						<li class="fragment fade-in-then-out" data-fragment-index="0">
+							<div style="line-height: 1.2;">
+								Increasing evidence suggests that PD (and potentially MSA) patients show a distinct microbiota imbalance (dysbiosis).
+							</div>
+						</li>
 						
-							<li class="fragment fade-in-then-out" data-fragment-index="0">
-								<div style="line-height: 1.2;">
-									Increasing evidence suggests that PD (and potentially MSA) patients show a distinct microbioata imbalance (dysbiosis).
-								</div>
-							</li>
-
-							<li class="fragment fade-in-then-out" data-fragment-index="1">
-								<div style="line-height: 1.2;">
-									This imbalance, coupled with a compromised mucin barrier, may trigger the innate immune system within the enteric nervous system leading to inflammation.
-								</div>
-							</li>					
-
-							<li class="fragment fade-in-then-out" data-fragment-index="2">
-								<div style="line-height: 1.2;">
-									Inflammation may play a key role in initiating the disease.
-								</div>
-							</li>
-
-							<li class="fragment fade-in-then-out" data-fragment-index="3">
-								<div style="line-height: 1.2;">
-								    Notably, the phyla Proteobacteria, Firmicutes, and Verrucomicrobia show significant vulnerabilities to this assault.
-								</div>
-							</li>
-						</ul>
-						</div>
-					</section>					
-
-					<section data-footer="Gateway - Slide 3 of x" style="padding: 0; position: relative;">	
-						<h3 style ="color: indigo; text-align:center; margin-bottom:1rem;">Dysbiosis</h3>
-						<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
-							<iframe 
-								src="side_by_side_microbiome_sunburst.html" 
-								style="width: 100%; height: 100%; border: none;" 
-								allowtransparency="true" 
-								scrolling="no">
-							</iframe>
-						</div>
-					</section>
-				</section>	
+						<li class="fragment fade-in-then-out" data-fragment-index="1">
+							<div style="line-height: 1.2;">
+								This imbalance, coupled with a compromised mucin barrier, may trigger the innate immune system within the enteric nervous system leading to inflammation.
+							</div>
+						</li>
+						
+						<li class="fragment fade-in-then-out" data-fragment-index="2">
+							<div style="line-height: 1.2;">Inflammation may play a key role in initiating the disease.</div>
+						</li>
+						
+						<li class="fragment fade-in-then-out" data-fragment-index="3">
+							<div style="line-height: 1.2;">
+								Notably, the phyla Proteobacteria, Firmicutes, and Verrucomicrobia show significant vulnerabilities to this assault.
+							</div>
+						</li>
+						
+					</ul>
+				</section>		
 				
-				<section>
+				<section class="fullbleed" data-footer="Test Slide">
+					<h3>Dysbiosis</h3>
+					<div class="r-stretch">
+					<iframe src="sunbursts.html" scrolling="no"></iframe>
+					</div>
+				</section>
+				
+			</section>
+			
+			<section>
 					<section data-footer="Chronic Inflammation Drivers - Slide 1 of 7">
 						<h3 style="color: indigo; margin-bottom: 70px;">Chronic Inflammation Drivers</h3>
 						<div style="display: flex; justify-content: flex-start; gap: 40px; transform: translateX(-5%); margin-top: 20px;">
@@ -494,125 +446,115 @@
 					<section><h2>Subslide 1</h2></section>
 					<section><h2>Subslide 2</h2></section>
 				</section>
-			</div>
 		</div>
+	</div>
 
-		<script src="dist/reveal.js"></script>
-		<script src="plugin/notes/notes.js"></script>
-		<script src="plugin/markdown/markdown.js"></script>
-		<script src="plugin/highlight/highlight.js"></script>
+  <div id="custom-footer"></div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script>
+  // --- Reveal init ---
+		Reveal.initialize({
+			controls: true,
+			progress: false,   // hide the thin gray progress line
+			center: false,
+			hash: true,
+			preloadIframes: true,
+			plugins: [ RevealNotes ]
+		});
+
+
+		(function () {
+			const SELECTOR = '.hide-in-presentation';   // slides to hide except in overview
+			const backups = [];                          // where we store where each slide lives
+
+	// On deck ready: remove the target slides from the DOM (but remember their spot)
+		Reveal.on('ready', () => {
+			document.querySelectorAll(SELECTOR).forEach(slide => {
+			backups.push({
+				slide,
+				parent: slide.parentNode,
+				next: slide.nextSibling
+			});
+			slide.parentNode.removeChild(slide);
+		});
+		Reveal.sync();
+		});
+
+	// When overview opens: put them back in their original places
+		Reveal.on('overviewshown', () => {
+			backups.forEach(({ slide, parent, next }) => {
+			if (!parent.contains(slide)) parent.insertBefore(slide, next);
+			});
+		Reveal.sync();
+		});
+
+	// When overview closes: remove them again
+		Reveal.on('overviewhidden', () => {
+			backups.forEach(({ slide, parent }) => {
+			if (parent.contains(slide)) parent.removeChild(slide);
+			});
+		Reveal.sync();
+		});
+		})();
+
+
 		
-		<script>
-				// Reveal initialization
-			Reveal.initialize({
-				controls: true,
-				progress: true,
-				center: false,
-				hash: true,
-				plugins: [ RevealNotes, RevealMarkdown, RevealHighlight ]
-			});
-			
-			
-			(function(){
-				// selector for the slides you want only in overview
-				const BONUS = '.hide-in-presentation';
 
-				// array to hold references so we can re‑insert them later
-				const backups = [];
-				
-				const isFormatMode = window.location.search.includes('format=true');
-				if (isFormatMode) {
-					backups.forEach(({ parent, nextSibling, slide }) => {
-						if (!parent.contains(slide)) {
-							parent.insertBefore(slide, nextSibling);
-						}
-					});
-					Reveal.sync();
-				}
+  // --- Helper: kick the iframe to resize its charts (ECharts listens to window.resize) ---
+		function nudgeIframeCharts(slide) {
+			const ifr = slide?.querySelector('.r-stretch > iframe, iframe');
+			if (ifr && ifr.contentWindow) {
+			// 1) immediately after slide change
+				ifr.contentWindow.dispatchEvent(new Event('resize'));
+			// 2) again after layout settles
+				setTimeout(() => {
+				ifr.contentWindow.dispatchEvent(new Event('resize'));
+				}, 60);
+			}
+		}
 
+  // --- Optional: if some iframes use Plotly with #graph, try to resize that too ---
+		function resizePlotlyIn(iframe) {
+			try {
+			const w = iframe.contentWindow;
+			if (!w) return;
+			const gd = w.document && w.document.getElementById('graph');
+			if (gd && w.Plotly && w.Plotly.Plots) w.Plotly.Plots.resize(gd);
+			} catch (_) {}
+		}
 
-				// once Reveal is ready, pull them out of the DOM
-				Reveal.addEventListener('ready', function(){
-					document.querySelectorAll(BONUS).forEach(slide => {
-					backups.push({
-					parent:     slide.parentNode,
-					nextSibling: slide.nextSibling,
-					slide:      slide
-				});
-				slide.parentNode.removeChild(slide);
-				});
-			
-				Reveal.sync();
-				});
-
-				// when entering overview: put them back
-				Reveal.addEventListener('overviewshown', function(){
-					backups.forEach(({parent,nextSibling,slide})=>{
-					if(!parent.contains(slide)){
-					parent.insertBefore(slide, nextSibling);
-					}
-				});
-				Reveal.sync();
-				});
-
-				// when leaving overview: remove them again
-				Reveal.addEventListener('overviewhidden', function(){
-					backups.forEach(({parent,slide})=>{
-					if(parent.contains(slide)){
-					parent.removeChild(slide);
-					}
-				});
-				Reveal.sync();
-				});
-			})();
+  // --- Keep footer text + space in sync, and stabilize chart size on entry ---
+		function onEnterSlide(slide) {
+			const text = slide?.getAttribute('data-footer') || '';
+			const footerEl = document.getElementById('custom-footer');
+			if (footerEl) footerEl.innerText = text;
 
 
-			Reveal.on('slidechanged', event => {
-				const currentSlide = event.currentSlide;
-				const footerText = currentSlide.getAttribute('data-footer') || '';
-				document.getElementById('custom-footer').innerText = footerText;
-			});
-			
-				// Initialize on first load
-			document.addEventListener('DOMContentLoaded', () => {
-				const currentSlide = Reveal.getCurrentSlide();
-				const footerText = currentSlide.getAttribute('data-footer') || '';
-				document.getElementById('custom-footer').innerText = footerText;
-			});
-			
-				// Shrink old fragments
-			Reveal.on('fragmentshown', function(event) {
-				const currentFragment = event.fragment;
-				const previousFragments = Array.from(currentFragment.parentNode.children)
-					.slice(0, Array.from(currentFragment.parentNode.children).indexOf(currentFragment));
-					previousFragments.forEach(fragment => {
-					fragment.classList.add('shrunk');
-				});
-			});
+		// Reset any "shrunk" fragments from a previous visit (harmless if none exist)
+			slide?.querySelectorAll('.shrunk').forEach(n => n.classList.remove('shrunk'));
 
-				// Resize Plotly graph in iframe when slide changes
-			Reveal.addEventListener('slidechanged', function(event) {
-				const iframe = event.currentSlide.querySelector("iframe");
-				if (iframe && iframe.contentWindow && iframe.contentWindow.Plotly) {
-					const graphDiv = iframe.contentWindow.document.getElementById('graph');
-				if (graphDiv) {
-					iframe.contentWindow.Plotly.Plots.resize(graphDiv);
-					}
-				}
-			});
-		</script>
-		
-		<div id="custom-footer" style="
-			position: fixed;
-			bottom: 10px;
-			width: 100%;
-			text-align: center;
-			font-size: 14px;
-			color: indigo;
-			font-family: sans-serif;
-			pointer-events: none;
-			z-index: 99;">
-		</div>
+		// Nudge iframe charts (ECharts) and optionally Plotly
+			nudgeIframeCharts(slide);
 
-	</body>
+			const ifr = slide?.querySelector('.r-stretch > iframe, iframe');
+			if (ifr) requestAnimationFrame(() => resizePlotlyIn(ifr));
+		}
+
+  // First load
+		Reveal.on('ready', ev => onEnterSlide(ev.currentSlide));
+
+  // On every slide change
+		Reveal.on('slidechanged', ev => onEnterSlide(ev.currentSlide));
+
+  // On window resize (e.g., window resized or UI chrome changes)
+		window.addEventListener('resize', () => {
+			const slide = Reveal.getCurrentSlide();
+			if (slide) nudgeIframeCharts(slide);
+		});
+</script>
+
+</body>
 </html>
+
